@@ -1,0 +1,281 @@
+import Example from '~/components/example'
+import { Code, InlineCode } from '~/components/text/code'
+import { HelpLink } from '~/components/text/link'
+import Note from '~/components/text/note'
+import { P } from '~/components/text/paragraph'
+import Endpoint from '~/components/api/endpoint'
+import Request from '~/components/api/request'
+
+export const meta = {
+  editUrl: 'pages/docs/api/v2/api-docs-mdx/endpoints/projects.mdx',
+  lastEdited: '2019-04-16T14:35:51.000Z'
+}
+
+## Projects
+
+### Create a project
+
+<Endpoint method="POST" url="/v1/projects/ensure-project" />
+
+Create a project with the `name` request parameter providing it does not already exist.
+
+<Note>The project ID is taken from the account.</Note>
+
+#### Request Parameters
+
+| Key      | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                       |
+| -------- | ---------------------------------------------------------- | -------- | --------------------------------- |
+| **name** | <HelpLink href="#api-basics/types">String</HelpLink>       | Yes      | The desired name for the project. |
+
+<Example>
+  <span>Example request:</span>
+
+<Request
+  method="POST"
+  url="https://api.zeit.co/v1/projects/ensure-project"
+  headers={{
+    'Content-Type': 'application/json'
+  }}
+  auth
+  body={{
+    name: 'a-project-name'
+  }}
+/>
+
+Example response:
+
+<Code lang="json">{`{
+    "id":"QmQKrt94KYKF3sDysJq19N87uMmE8Wicbt2GirePy1dH8U",
+    "name":"a-project-name",
+    "accountId":"K4amb7K9dAt5R2vBJWF32bmY",
+    "updatedAt":1555413045188,
+    "createdAt":1555413045188
+}`}</Code>
+</Example>
+
+### Get all your projects
+
+<Endpoint method="GET" url="/v1/projects/list" />
+
+Get a list of all the projects you currently have under your account.
+
+<Note>
+  The order is always based on the <InlineCode>updatedAt</InlineCode> field of
+  the project.
+</Note>
+
+#### Query Parameters
+
+| Key                     | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                                        |
+| ----------------------- | ---------------------------------------------------------- | -------- | -------------------------------------------------- |
+| **limit**               | <HelpLink href="#api-basics/types">Number</HelpLink>       | No       | Limit the number of projects returned.             |
+| **from**                | <HelpLink href="#api-basics/types">Date</HelpLink>         | No       | The `updatedAt` point where the list should start. |
+| **search**              | <HelpLink href="#api-basics/types">String</HelpLink>       | No       | Search projects by the name field.                 |
+| **recentDeployments=1** | <HelpLink href="#api-basics/types">Number</HelpLink>       | No       | Includes recent deployments in the project object. |
+
+<Example>
+  <span>Example request:</span>
+
+<Request url="https://api.zeit.co/v1/projects/list?limit=5" auth />
+
+Example response:
+
+<Code lang="json">{`
+[
+    {
+        "id":"QmQKrt94KYKF3sDysJq19N8gvhmE8Wicbt2GirePy1dH8U",
+        "name":"a-project-name",
+        "accountId":"K4amb7K9dAt5R2vBJWF32bmY",
+        "createdAt":1555413045188,
+        "updatedAt":1555413045188
+    },
+    {
+        "id":"QmRhxc9HAmRMcLvWhCAf2ALLctxZ4s4fwsM1D5kNM8PJuL",
+        "name":"another-project-name",
+        "accountId":"K4amb7K9dAt5R2vBJWF32bmY",
+        "createdAt":1555072968396,
+        "updatedAt":1555345633993
+    }
+]
+`}</Code>
+</Example>
+
+### Get a single project
+
+<Endpoint>
+  GET /v1/projects/:id/info
+  <br />
+  GET /v1/projects/:name/info
+</Endpoint>
+
+Get the information for a specific project by passing either the project `id` or `name` in the URL as a query parameter.
+
+#### Query Parameters
+
+| Key      | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                    |
+| -------- | ---------------------------------------------------------- | -------- | ------------------------------ |
+| **id**   | <HelpLink href="#api-basics/types">ID</HelpLink>           | No       | The unique project identifier. |
+| **name** | <HelpLink href="#api-basics/types">String</HelpLink>       | No       | The project name.              |
+
+<Example>
+  <span>Example request:</span>
+
+<Request url="https://api.zeit.co/v1/projects/a-project-name/info" auth />
+
+Example response:
+
+<Code lang="json">{`{
+    "id":"QmQKrt94KYKF3sDysJq19N8gvhmE8Wicbt2GirePy1dH8U",
+    "name":"a-project-name",
+    "accountId":"K4amb7K9dAt5R2vBJWF32bmY",
+    "createdAt":1555413045188,
+    "updatedAt":1555413045188
+}`}</Code>
+</Example>
+
+### Remove a single project
+
+<Endpoint method="DELETE" url="/v1/projects/remove" />
+
+Delete a single project by passing the project `name` as a request parameter.
+
+#### Request Parameters
+
+| Key      | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description       |
+| -------- | ---------------------------------------------------------- | -------- | ----------------- |
+| **name** | <HelpLink href="#api-basics/types">String</HelpLink>       | Yes      | The project name. |
+
+<Example>
+  <span>Example request:</span>
+
+<Request
+  method="DELETE"
+  url="https://api.zeit.co/v1/projects/remove"
+  headers={{
+    'Content-Type': 'application/json'
+  }}
+  auth
+  body={{
+    name: 'a-project-name'
+  }}
+/>
+
+</Example>
+
+<Note>
+  If the request is succesful, you will receive a 204 HTTP Status code in the
+  response.
+</Note>
+
+### Create project environment variables
+
+<Endpoint method="POST" url="/v1/projects/:id/env" />
+
+Create a set of new environment variables for the project by passing the project `id` in the URL as a query parameter and an `env` map as a request parameter.
+
+<Note>
+  For security, only secrets can be used for these environment variables.
+</Note>
+
+<Note>
+  Only deployments made after this call will receive the environment variables
+  set.
+</Note>
+
+#### Query Parameters
+
+| Key    | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                    |
+| ------ | ---------------------------------------------------------- | -------- | ------------------------------ |
+| **id** | <HelpLink href="#api-basics/types">ID</HelpLink>           | Yes      | The unique project identifier. |
+
+#### Request Parameters
+
+| Key     | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                            |
+| ------- | ---------------------------------------------------------- | -------- | -------------------------------------- |
+| **env** | <HelpLink href="#api-basics/types">Map</HelpLink>          | Yes      | A set of secret environment variables. |
+
+<Example>
+  <span>Example request:</span>
+
+<Request
+  method="POST"
+  url="https://api.zeit.co/v1/projects/QmXtXGhXF6mZQ5ete2AwbeV3zAS17wEj7LYM3LuQ3Y45FF/env"
+  auth
+  body={{
+    env: {
+      API_SECRET: '@a-new-secret'
+    }
+  }}
+/>
+
+Example response:
+
+<Code lang="json">{`{
+      API_SECRET: '@a-new-secret'
+}`}</Code>
+</Example>
+
+<Note>
+  The response will include all environment variables for the project.
+</Note>
+
+### Get project environment variables
+
+<Endpoint method="GET" url="/v1/projects/:id/env" />
+
+Retrieve the environment variables for a given project by passing the project `id` in the URL as a query parameter.
+
+#### Query Parameters
+
+| Key    | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                    |
+| ------ | ---------------------------------------------------------- | -------- | ------------------------------ |
+| **id** | <HelpLink href="#api-basics/types">ID</HelpLink>           | Yes      | The unique project identifier. |
+
+<Example>
+  <span>Example request:</span>
+
+<Request
+  url="https://api.zeit.co/v1/projects/QmXtXGhXF6mZQ5ete2AwbeV3zAS17wEj7LYM3LuQ3Y45FF/env"
+  auth
+/>
+
+Example response:
+
+<Code lang="json">{`{
+      API_SECRET: '@a-new-secret'
+}`}</Code>
+</Example>
+
+### Delete specific environment variable
+
+<Endpoint method="DELETE" url="/v1/projects/:id/env/:key" />
+
+Delete a specific environment variable for a given project by passing both the project `id` and `env` key in the URL as query parameters.
+
+#### Query Parameters
+
+| Key     | <HelpLink href="#api-basics/types" hasIcon>Type</HelpLink> | Required | Description                    |
+| ------- | ---------------------------------------------------------- | -------- | ------------------------------ |
+| **id**  | <HelpLink href="#api-basics/types">ID</HelpLink>           | Yes      | The unique project identifier. |
+| **key** | <HelpLink href="#api-basics/types">String</HelpLink>       | Yes      | The environment variable key.  |
+
+<Example>
+  <span>Example request:</span>
+
+<Request
+  method="DELETE"
+  url="https://api.zeit.co/v1/projects/QmXtXGhXF6mZQ5ete2AwbeV3zAS17wEj7LYM3LuQ3Y45FF/env/API_SECRET"
+  auth
+/>
+
+Example response:
+
+<Code lang="json">{`{
+      API_SECRET2: '@a-new-secret2'
+}`}</Code>
+</Example>
+
+<Note>
+  The response will include all <P.B>remaining</P.B> environment variables for
+  the project.
+</Note>
