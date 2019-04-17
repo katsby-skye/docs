@@ -11,7 +11,6 @@ import { Menu, MenuItem, MenuDivider } from '~/components/menu'
 import { Navigation, NavigationItem } from '~/components/navigation'
 import AutoComplete from '~/components/search'
 import Avatar from '~/components/avatar'
-import ChatCount from '~/components/chat-count'
 import LayoutHeader from './header-wrapper'
 import Logo from '~/components/icons/logo'
 import Plus from '~/components/icons/plus'
@@ -379,14 +378,14 @@ class Header extends Component {
               {!user ? (
                 <Fragment>
                   <NavigationItem className="chat" href="https://zeit.co/chat">
-                    Support <ChatCount className="chat-count" />
+                    Support
                   </NavigationItem>
                   <NavigationItem href="/login">Login</NavigationItem>
                 </Fragment>
               ) : (
                 <Fragment>
                   <NavigationItem className="chat" href="https://zeit.co/chat">
-                    Support <ChatCount className="chat-count" />
+                    Support
                   </NavigationItem>
                   <Menu
                     tip
